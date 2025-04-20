@@ -3,9 +3,6 @@ import os
 import sys
 import time
 
-# Path for your service key
-sys.path.append('/content/drive/MyDrive/Colab Notebooks/LangChain')
-
 from service_key import groq_key
 
 # Setting environment variable
