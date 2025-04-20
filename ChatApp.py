@@ -73,11 +73,11 @@ if send_clicked and user_input:
     st.session_state.messages.append(("bot", bot_reply))
     
     # Clear input field
-    st.experimental_rerun()
+    st.rerun()
 
 if clear_clicked:
     st.session_state.messages = []
-    st.experimental_rerun()
+    st.rerun()
 
 # Display chat history
 for sender, message in st.session_state.messages:
