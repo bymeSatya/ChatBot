@@ -1,6 +1,7 @@
 import streamlit as st
 import os
 import sys
+import time
 
 # Path for your service key
 sys.path.append('/content/drive/MyDrive/Colab Notebooks/LangChain')
@@ -57,23 +58,43 @@ chat_container = st.container()
 with chat_container:
     for sender, message in st.session_state.messages:
         if sender == "user":
-            st.markdown(f"<div style='text-align: right; background-color: #DCF8C6; padding: 10px; border-radius: 10px; margin: 5px; display: inline-block;'>{message}</div>", unsafe_allow_html=True)
+            st.markdown(
+                f"<div style='text-align: right; background-color: #4CAF50; color: white; padding: 10px; border-radius: 10px; margin: 5px; max-width: 70%; margin-left: auto;'>{message}</div>",
+                unsafe_allow_html=True
+            )
         else:
-            st.markdown(f"<div style='text-align: left; background-color: #F1F0F0; padding: 10px; border-radius: 10px; margin: 5px; display: inline-block;'>{message}</div>", unsafe_allow_html=True)
+            st.markdown(
+                f"<div style='text-align: left; background-color: #f0f0f0; color: black; padding: 10px; border-radius: 10px; margin: 5px; max-width: 70%;'>{message}</div>",
+                unsafe_allow_html=True
+            )
 
 # --- INPUT BOX ---
 user_input = st.chat_input("Type your message here...")
 
 if user_input:
-    # Save user input
+    # Save user message
     st.session_state.messages.append(("user", user_input))
 
-    # Get bot response
+    # Show 'Bot is typing...' message
+    with chat_container:
+        typing_message = st.empty()
+        typing_message.markdown(
+            "<div style='text-align: left; background-color: #f0f0f0; color: grey; padding: 10px; border-radius: 10px; margin: 5px; max-width: 70%;'>🤖 Bot is typing...</div>",
+            unsafe_allow_html=True
+        )
+
+    # Simulate a small typing delay (optional)
+    time.sleep(0.5)
+
+    # Get real bot response
     response = with_history.invoke(
         [HumanMessage(content=user_input)],
         config={"configurable": {"session_id": st.session_state.session_id}}
     )
     bot_reply = response.content.replace("\\n", "\n")
+
+    # Replace 'Bot is typing...' with real reply
+    typing_message.empty()
     st.session_state.messages.append(("bot", bot_reply))
 
     st.rerun()
