@@ -1,3 +1,5 @@
+# ChatApp.py
+
 import streamlit as st
 import os
 import sys
@@ -39,31 +41,32 @@ def get_session_history(session_id: str) -> BaseChatMessageHistory:
 # Runnable with history
 with_history = RunnableWithMessageHistory(chain, get_session_history)
 
-# Streamlit app
-st.set_page_config(page_title="LangChain Chatbot", page_icon=":speech_balloon:")
-st.title("Chatbot using LangChain and Streamlit")
+# --- Streamlit App Starts Here ---
+st.set_page_config(page_title="Chatbot using LangChain", page_icon="💬", layout="wide")
+st.title("💬 LangChain ChatBot")
 
-# Initialize session
+# Initialize session state
 if "session_id" not in st.session_state:
     st.session_state.session_id = "abc"
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Text input
-user_input = st.text_input("You:", key="user_input")
+# Create chat message container
+chat_container = st.container()
 
-# Button actions
-col1, col2 = st.columns([1, 1])
-with col1:
-    send_clicked = st.button("Send")
-with col2:
-    clear_clicked = st.button("Clear Chat")
+# Layout for input at bottom
+with st.container():
+    col1, col2 = st.columns([8, 1])
+    with col1:
+        user_input = st.text_input("Type your message...", key="user_input", label_visibility="collapsed", placeholder="Ask me anything... 👋")
+    with col2:
+        send_clicked = st.button("Send")
 
-if send_clicked and user_input:
-    # Send user message
+# If ENTER is pressed or button clicked
+if user_input and (send_clicked or st.session_state.get("enter_pressed", False)):
     st.session_state.messages.append(("user", user_input))
-    
+
     # Get response
     response = with_history.invoke(
         [HumanMessage(content=user_input)],
@@ -71,17 +74,25 @@ if send_clicked and user_input:
     )
     bot_reply = response.content.replace("\\n", "\n")
     st.session_state.messages.append(("bot", bot_reply))
-    
-    # Clear input field
-    st.rerun()
 
-if clear_clicked:
-    st.session_state.messages = []
+    # Clear input
+    st.session_state.user_input = ""
+    st.session_state.enter_pressed = False
     st.rerun()
 
 # Display chat history
-for sender, message in st.session_state.messages:
-    if sender == "user":
-        st.markdown(f"**You:** {message}")
-    else:
-        st.markdown(f"**Bot:** {message}")
+with chat_container:
+    for sender, message in st.session_state.messages:
+        if sender == "user":
+            st.markdown(f"<div style='text-align: right; background-color: #DCF8C6; padding: 10px; border-radius: 10px; margin: 5px; display: inline-block;'>{message}</div>", unsafe_allow_html=True)
+        else:
+            st.markdown(f"<div style='text-align: left; background-color: #F1F0F0; padding: 10px; border-radius: 10px; margin: 5px; display: inline-block;'>{message}</div>", unsafe_allow_html=True)
+
+# Keyboard shortcut handling
+def keyboard_event_handler():
+    st.session_state.enter_pressed = True
+
+# Hack: Invisible form to detect Enter key
+with st.form(key="hidden_form", clear_on_submit=True):
+    st.text_input("hidden", key="hidden_input", label_visibility="collapsed")
+    submitted = st.form_submit_button("Submit", on_click=keyboard_event_handler)
