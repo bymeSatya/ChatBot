@@ -1,11 +1,9 @@
-# ChatApp.py
-
 import streamlit as st
 import os
 import sys
 
 # Path for your service key
-#sys.path.append('/content/drive/MyDrive/Colab Notebooks/LangChain')
+sys.path.append('/content/drive/MyDrive/Colab Notebooks/LangChain')
 
 from service_key import groq_key
 
@@ -55,32 +53,7 @@ if "messages" not in st.session_state:
 # Create chat message container
 chat_container = st.container()
 
-# Layout for input at bottom
-with st.container():
-    col1, col2 = st.columns([8, 1])
-    with col1:
-        user_input = st.text_input("Type your message...", key="user_input", label_visibility="collapsed", placeholder="Ask me anything... 👋")
-    with col2:
-        send_clicked = st.button("Send")
-
-# If ENTER is pressed or button clicked
-if user_input and (send_clicked or st.session_state.get("enter_pressed", False)):
-    st.session_state.messages.append(("user", user_input))
-
-    # Get response
-    response = with_history.invoke(
-        [HumanMessage(content=user_input)],
-        config={"configurable": {"session_id": st.session_state.session_id}}
-    )
-    bot_reply = response.content.replace("\\n", "\n")
-    st.session_state.messages.append(("bot", bot_reply))
-
-    # Clear input
-    st.session_state.user_input = ""
-    st.session_state.enter_pressed = False
-    st.rerun()
-
-# Display chat history
+# --- CHAT HISTORY ---
 with chat_container:
     for sender, message in st.session_state.messages:
         if sender == "user":
@@ -88,11 +61,19 @@ with chat_container:
         else:
             st.markdown(f"<div style='text-align: left; background-color: #F1F0F0; padding: 10px; border-radius: 10px; margin: 5px; display: inline-block;'>{message}</div>", unsafe_allow_html=True)
 
-# Keyboard shortcut handling
-def keyboard_event_handler():
-    st.session_state.enter_pressed = True
+# --- INPUT BOX ---
+user_input = st.chat_input("Type your message here...")
 
-# Hack: Invisible form to detect Enter key
-with st.form(key="hidden_form", clear_on_submit=True):
-    st.text_input("hidden", key="hidden_input", label_visibility="collapsed")
-    submitted = st.form_submit_button("Submit", on_click=keyboard_event_handler)
+if user_input:
+    # Save user input
+    st.session_state.messages.append(("user", user_input))
+
+    # Get bot response
+    response = with_history.invoke(
+        [HumanMessage(content=user_input)],
+        config={"configurable": {"session_id": st.session_state.session_id}}
+    )
+    bot_reply = response.content.replace("\\n", "\n")
+    st.session_state.messages.append(("bot", bot_reply))
+
+    st.rerun()
