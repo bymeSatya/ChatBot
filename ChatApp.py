@@ -3,7 +3,7 @@ import os
 import sys
 
 # Path for your service key
-sys.path.append('/content/drive/MyDrive/Colab Notebooks/LangChain')
+#sys.path.append('/content/drive/MyDrive/Colab Notebooks/LangChain')
 
 from service_key import groq_key
 
