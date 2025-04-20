@@ -42,7 +42,7 @@ with_history = RunnableWithMessageHistory(chain, get_session_history)
 
 # --- Streamlit App Starts Here ---
 st.set_page_config(page_title="Chatbot using LangChain", page_icon="💬", layout="wide")
-st.title("💬 LangChain ChatBot")
+st.title("💬 Satya ChatBot")
 
 # Initialize session state
 if "session_id" not in st.session_state:
@@ -57,16 +57,34 @@ chat_container = st.container()
 # --- CHAT HISTORY ---
 with chat_container:
     for sender, message in st.session_state.messages:
+        bubble_style = """
+            display: inline-block;
+            padding: 10px 15px;
+            border-radius: 20px;
+            margin: 5px;
+            word-wrap: break-word;
+            max-width: 80%;
+            min-width: 10px;
+        """
+
         if sender == "user":
             st.markdown(
-                f"<div style='text-align: right; background-color: #4CAF50; color: white; padding: 10px; border-radius: 10px; margin: 5px; max-width: 70%; margin-left: auto;'>{message}</div>",
+                f"<div style='text-align: right;'><div style='{bubble_style} background-color: #4CAF50; color: white; margin-left: auto;'>{message}</div></div>",
                 unsafe_allow_html=True
             )
         else:
             st.markdown(
-                f"<div style='text-align: left; background-color: #f0f0f0; color: black; padding: 10px; border-radius: 10px; margin: 5px; max-width: 70%;'>{message}</div>",
+                f"<div style='text-align: left;'><div style='{bubble_style} background-color: #f0f0f0; color: black;'>{message}</div></div>",
                 unsafe_allow_html=True
             )
+
+    # --- 👇 Auto Scroll JS Code ---
+    st.markdown("""
+        <script>
+            var chat = window.parent.document.querySelector('section.main');
+            if (chat) { chat.scrollTo(0, chat.scrollHeight); }
+        </script>
+    """, unsafe_allow_html=True)
 
 # --- INPUT BOX ---
 user_input = st.chat_input("Type your message here...")
@@ -79,11 +97,10 @@ if user_input:
     with chat_container:
         typing_message = st.empty()
         typing_message.markdown(
-            "<div style='text-align: left; background-color: #f0f0f0; color: grey; padding: 10px; border-radius: 10px; margin: 5px; max-width: 70%;'>🤖 Bot is typing...</div>",
+            "<div style='text-align: left;'><div style='display: inline-block; padding: 10px 15px; border-radius: 20px; margin: 5px; background-color: #f0f0f0; color: grey;'>🤖 Bot is typing...</div></div>",
             unsafe_allow_html=True
         )
 
-    # Simulate a small typing delay (optional)
     time.sleep(0.5)
 
     # Get real bot response
@@ -93,7 +110,6 @@ if user_input:
     )
     bot_reply = response.content.replace("\\n", "\n")
 
-    # Replace 'Bot is typing...' with real reply
     typing_message.empty()
     st.session_state.messages.append(("bot", bot_reply))
 
