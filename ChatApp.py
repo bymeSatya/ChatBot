@@ -8,7 +8,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-groq_key = os.getenv('groq_key')
+#groq_key = os.getenv('groq_key')
+groq_key = st.secrets["groq_key"]
 
 os.environ["GROQ_API_KEY"] = groq_key
 
