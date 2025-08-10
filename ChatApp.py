@@ -4,10 +4,11 @@ import sys
 import json
 import time
 from datetime import datetime
+from dotenv import load_dotenv
 
-# --- SETUP SECTION ---
-#sys.path.append('/content/drive/MyDrive/Colab Notebooks/LangChain')
-from service_key import groq_key
+load_dotenv()
+
+groq_key = os.getenv('groq_key')
 
 os.environ["GROQ_API_KEY"] = groq_key
 
