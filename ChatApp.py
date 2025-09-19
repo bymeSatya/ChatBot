@@ -20,7 +20,7 @@ from langchain_core.chat_history import InMemoryChatMessageHistory, BaseChatMess
 from langchain_core.runnables.history import RunnableWithMessageHistory
 
 # --- LANGCHAIN SETUP ---
-model = ChatGroq(model="llama3-8b-8192")
+model = ChatGroq(model="openai/gpt-oss-120b")
 
 prompt_template = ChatPromptTemplate.from_messages([
     ("system", "You are a helpful assistant. Answer all questions to the best of your ability."),
